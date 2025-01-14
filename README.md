@@ -157,3 +157,32 @@ echo 2 + 4;
 
 - **`bloginfo('description')`**:  
   Retrieves the website's tagline or description.
+
+#### Functions to configure css or scripts file 
+```php
+<?php
+  echo get_theme_file_uri('/images/bus.jpg') 
+ ?>
+```
+```php
+<?php
+
+function university_files(){
+    wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);//hey wordpress, please output the main.js file
+    wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+    wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
+    wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));//hey wordpress, please output the style.css file(default stylesheet in wordpress)
+    wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
+}
+add_action('wp_enqueue_scripts', 'university_files');//hey wordpress, when you are about to output the scripts, please run this function
+```
+#### key takeaways
+- **wp_enqueue_script**: This function is used to safely add JavaScript files to a WordPress site. It ensures that the scripts are loaded in the proper order and only when needed, avoiding conflicts.
+
+- **wp_enqueue_style**: This function is used to safely add CSS files to a WordPress site. It helps in managing the order of stylesheets and avoids duplication or conflicts.
+
+- **add_action**: This function is used to hook custom functions into specific actions or events in WordPress, such as loading scripts, creating custom post types, or adding content to specific sections of the site.
+
+- **get_theme_file_uri**: This function returns the URI (Uniform Resource Identifier) to a file located within the theme's directory, allowing you to link assets such as images, JavaScript, or CSS files.
+
+###### wp_head() and wp_footer() are essential WordPress functions that allow WordPress and plugins to inject necessary code (like styles, scripts, and meta tags) into the header and footer sections of a theme. They ensure proper functionality of features like the admin bar, plugin resources, and WordPress core features. Without these functions, critical functionality may break or not load as intended.
