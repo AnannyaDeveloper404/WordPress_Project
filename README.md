@@ -42,13 +42,14 @@ echo 2 + 4;
 ##### php and html can intertwine
 ```
 
+```php
 <!-- Functions -->
 
 <?php
     function myFirstFunction() {
         echo "<p>Hello ,This is my first php fun</p>";
     }
-   
+
 
     function mySecondFunction($name) {
         echo "<p>Hello $name</p>";
@@ -70,14 +71,14 @@ echo 2 + 4;
   ?>
   </p>
   <!-- Arrays -->
-<?php 
+<?php
     $myName="Brad";
 ?>
-<p>Hi ,my name is <?php 
+<p>Hi ,my name is <?php
     echo $myName; ?>
 </p>
 
-<?php 
+<?php
     $names = array("Brad","John","Jane","Doe");
     $count=1;
     $c=1;
@@ -93,6 +94,7 @@ echo 2 + 4;
 
 <p>Hi my name is <?php echo $names[2] ?> </p>
 
+
 //index.php
 
 <!--  How to display our blogpost in the homepage-->
@@ -107,6 +109,8 @@ echo 2 + 4;
 
 }
 ?>
+```
+
 //single.php
 
 ##### In order to display the post in their respective router,wordpress will look for single.php absence of which It will rendered in index.php
@@ -125,8 +129,9 @@ echo 2 + 4;
 
 //page.php
 
-## Page has their own url,it doesn't use index.php as fallback...It
+## Page has their own url,it doesn't use index.php as fallback...
 
+```php
   <?php
   while(have_posts()){
       the_post();
@@ -140,6 +145,7 @@ echo 2 + 4;
 ?>
 
   <h2>This is a page not a post</h2>
+```
 
 #### Key takeaways (functions)
 
@@ -158,12 +164,16 @@ echo 2 + 4;
 - **`bloginfo('description')`**:  
   Retrieves the website's tagline or description.
 
-#### Functions to configure css or scripts file 
+
+#### Retrieves url of the images
 ```php
 <?php
-  echo get_theme_file_uri('/images/bus.jpg') 
+  echo get_theme_file_uri('/images/bus.jpg')
  ?>
 ```
+
+#### Functions to configure css or scripts file
+
 ```php
 <?php
 
@@ -176,7 +186,9 @@ function university_files(){
 }
 add_action('wp_enqueue_scripts', 'university_files');//hey wordpress, when you are about to output the scripts, please run this function
 ```
+
 #### key takeaways
+
 - **wp_enqueue_script**: This function is used to safely add JavaScript files to a WordPress site. It ensures that the scripts are loaded in the proper order and only when needed, avoiding conflicts.
 
 - **wp_enqueue_style**: This function is used to safely add CSS files to a WordPress site. It helps in managing the order of stylesheets and avoids duplication or conflicts.
@@ -186,3 +198,155 @@ add_action('wp_enqueue_scripts', 'university_files');//hey wordpress, when you a
 - **get_theme_file_uri**: This function returns the URI (Uniform Resource Identifier) to a file located within the theme's directory, allowing you to link assets such as images, JavaScript, or CSS files.
 
 ###### wp_head() and wp_footer() are essential WordPress functions that allow WordPress and plugins to inject necessary code (like styles, scripts, and meta tags) into the header and footer sections of a theme. They ensure proper functionality of features like the admin bar, plugin resources, and WordPress core features. Without these functions, critical functionality may break or not load as intended.
+
+key takeaways:
+`site_url()`
+`the_permalink`
+
+#### Associative Arrays :
+
+```php
+<?php
+
+  $animalSounds=array(
+    'cat'=>'meow',
+    'dog'=>'bark',
+    'pig'=>'oink'
+  );
+
+  echo $animalSounds['dog'];
+?>
+```
+
+####
+
+```php
+
+    <?php
+    $theParent = wp_get_post_parent_id(get_the_ID());
+    if ($theParent) {
+    ?>
+      <div class="metabox metabox--position-up metabox--with-home-link">
+        <p>
+          <a class="metabox__blog-home-link" href=<?php echo get_permalink($theParent) ?>><i class="fa fa-home" aria-hidden="true"></i> Back to <?php echo get_the_title($theParent) ?></a> <span class="metabox__main"><?php echo the_title(); ?></span>
+        </p>
+      </div>
+      <p></p>
+    <?php
+    }
+    ?>
+    <?php
+    $testArray = get_pages(array(
+      'child_of' => get_the_ID()
+    ));
+    if ($theParent or $testArray){
+    ?>
+    <div class="page-links">
+      <h2 class="page-links__title"><a href=<?php echo get_permalink($theParent) ?>><?php echo get_the_title($theParent) ?></a></h2>
+      <ul class="min-list">
+
+        <?php
+        if ($theParent) {
+          $findChildrenOf = $theParent;
+        } else {
+          $findChildrenOf = get_the_ID();
+        }
+        wp_list_pages(array(
+
+          'title_li' => NULL,
+          'child_of' => $findChildrenOf,
+          'sort_column' => 'menu_order'
+        ));
+        ?>
+      </ul>
+    </div>
+
+  <?php }
+  ?>
+
+```
+
+# WordPress Key Takeaways Cheatsheet
+
+### `$theParent = wp_get_post_parent_id(get_the_ID());`
+
+- **Purpose**: Retrieves the ID of the parent post of the current post.
+- **Usage**:
+  ```php
+  $theParent = wp_get_post_parent_id(get_the_ID());
+  ```
+- **Example**:
+  For a page with a parent, `$theParent` will store the parent page's ID.
+
+---
+
+### `echo get_permalink($theParent);`
+
+- **Purpose**: Outputs the permalink (URL) of the parent post.
+- **Usage**:
+  ```php
+  echo get_permalink($theParent);
+  ```
+- **Example**:
+  Displays the URL to the parent page of the current page.
+
+---
+
+### `echo get_the_title($theParent);`
+
+- **Purpose**: Outputs the title of the parent post.
+- **Usage**:
+  ```php
+  echo get_the_title($theParent);
+  ```
+- **Example**:
+  Displays the title of the parent page of the current page.
+
+---
+
+### `wp_list_pages(array('title_li' => NULL, 'child_of' => $findChildrenOf, 'sort_column' => 'menu_order'));`
+
+- **Purpose**: Lists the child pages of a specific page.
+- **Parameters**:
+  - `title_li`: Removes the default title for the list.
+  - `child_of`: Specifies the parent page ID whose children are to be listed.
+  - `sort_column`: Sorts the pages based on menu order.
+- **Usage**:
+  ```php
+  <?php
+    theParent = wp_get_post_parent_id(get_the_ID());
+    if ($theParent) {
+      $findChildrenOf = $theParent;
+    } else {
+        $findChildrenOf = get_the_ID();
+    }
+    wp_list_pages(array(
+      'title_li' => NULL,
+      'child_of' => $findChildrenOf,
+      'sort_column' => 'menu_order'
+    ));
+  ```
+- **Example**:
+  Displays a list of child pages ordered by their menu position.
+
+---
+
+### `$testArray = get_pages(array('child_of' => get_the_ID()));`
+
+- **Purpose**: Retrieves an array of child pages for the current post.
+- **Parameters**:
+  - `child_of`: Specifies the ID of the parent page to find children for.
+- **Usage**:
+  ```php
+  $testArray = get_pages(array('child_of' => get_the_ID()));
+  ```
+- **Example**:
+  Stores an array of child pages of the current page into `$testArray` for further processing.
+
+---
+
+### General Notes
+
+- These functions are particularly useful for creating hierarchical navigation or custom menus in WordPress themes.
+- Always ensure to check for edge cases, such as when a page does not have a parent or children, to avoid errors.
+- Use WordPress Codex for detailed documentation on these functions: [WordPress Developer Resources](https://developer.wordpress.org).
