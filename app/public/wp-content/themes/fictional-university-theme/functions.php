@@ -11,6 +11,11 @@ add_action('wp_enqueue_scripts', 'university_files');//hey wordpress, when you a
 
 
 function university_features(){
+    // register_nav_menu('headerMenuLocation', 'Header Menu Location'); //hey wordpress, please add the header menu location
+    // register_nav_menu('footerLocationOne', 'Footer Location One');
+    // register_nav_menu('footerLocationTwo', 'Footer Location Two');
     add_theme_support('title-tag');//hey wordpress, please add the title tag to the head of the document
 }
 add_action( 'after_setup_theme','university_features');
+
+

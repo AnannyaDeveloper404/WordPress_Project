@@ -164,8 +164,8 @@ echo 2 + 4;
 - **`bloginfo('description')`**:  
   Retrieves the website's tagline or description.
 
-
 #### Retrieves url of the images
+
 ```php
 <?php
   echo get_theme_file_uri('/images/bus.jpg')
@@ -350,3 +350,28 @@ key takeaways:
 - These functions are particularly useful for creating hierarchical navigation or custom menus in WordPress themes.
 - Always ensure to check for edge cases, such as when a page does not have a parent or children, to avoid errors.
 - Use WordPress Codex for detailed documentation on these functions: [WordPress Developer Resources](https://developer.wordpress.org).
+
+### Generalized form of menu
+
+##### steps:
+
+- create menus
+  ```php
+  function university_features(){
+    register_nav_menu('headerMenuLocation', 'Header Menu Location'); //hey wordpress, please add the header menu location
+    register_nav_menu('footerLocationOne', 'Footer Location One');
+    register_nav_menu('footerLocationTwo', 'Footer Location Two');
+    add_theme_support('title-tag');//hey wordpress, please add the title tag to the head of the document
+  }
+  add_action( 'after_setup_theme','university_features');
+  ```
+- navigate to the location in wp-admin page appearance -> menu(menu will be added once you trigger `register_nav_menu` )
+- create menu and set its page and their order
+- then set the respective menu-list in their respective html position
+
+  ```php
+    <nav class="nav-list">
+          <?php wp_nav_menu(array("theme_location" => "footerLocationTwo")) ?>
+    </nav>
+
+  ```
