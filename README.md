@@ -218,7 +218,7 @@ key takeaways:
 ?>
 ```
 
-####
+#### Wordpress/php code snippet
 
 ```php
 
@@ -239,7 +239,7 @@ key takeaways:
     $testArray = get_pages(array(
       'child_of' => get_the_ID()
     ));
-    if ($theParent or $testArray){
+    if ($theParent or $testArray){///Used to check if the page has any child or if the page is child of any parent within the if statement
     ?>
     <div class="page-links">
       <h2 class="page-links__title"><a href=<?php echo get_permalink($theParent) ?>><?php echo get_the_title($theParent) ?></a></h2>
@@ -247,9 +247,9 @@ key takeaways:
 
         <?php
         if ($theParent) {
-          $findChildrenOf = $theParent;
+          $findChildrenOf = $theParent; //list all the child of the parent(e.g,parent(about)=>children(our history ,our goal))
         } else {
-          $findChildrenOf = get_the_ID();
+          $findChildrenOf = get_the_ID();//list all the child of its own since the routed page is the parent itself
         }
         wp_list_pages(array(
 
@@ -375,3 +375,135 @@ key takeaways:
     </nav>
 
   ```
+
+### Directory Management in Wordpress's perspective
+
+- condition : In reading section of setting set home page set Home and set post page as blog
+
+For Home page ,Select front-page.php to render the home page by default.Router will be
+
+- ```php
+     <?php echo site_url() ?>
+  ```
+
+For Blog page ,render all the posts in the blog will be rendered in the router
+
+- ```php
+  <?php echo site_url('blog') ?>
+  ```
+
+- Blog renders the index.php as its main page
+
+For rendering posts in their respective page,Wordpress will find single.php to render the post.
+
+- ```php
+      <?php echo site_url('blog/postname') ?>
+  ```
+
+For Pages,Wordpress will look for single.php to render the respective page with the respective content
+
+- ```php
+        <?php echo site_url('/page-name') ?>
+  ```
+
+```
+
+```
+
+For custom posts ,wordpress will look for the file single-<custom-post-name>(e.g,single-event.php)
+
+- Custom posts main page (where all the custom posts being rendered) ,wordpress look for archive-<custom-post-name>.php and load the custom post's content accordingly
+- In order to rendering Each single custom post,Wordpress will look for single-<custom-post-name>.php (e.g,single-event.php)
+
+#### Code snippets 1:
+
+```php
+  <?php
+            $homepageEvents = new WP_Query(array(
+                'posts_per_page' => 2,
+                'post_type' => 'event'
+            ));
+            while ($homepageEvents->have_posts()) {
+                $homepageEvents->the_post(); ?>
+                <div class="event-summary">
+                    <a class="event-summary__date t-center" href="#">
+                        <span class="event-summary__month">Mar</span>
+                        <span class="event-summary__day">25</span>
+                    </a>
+                    <div class="event-summary__content">
+                        <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h5>
+                        <p><?php if (has_excerpt()) {
+                                echo get_the_excerpt();
+                            } else {
+                                echo  wp_trim_words(get_the_content(), 18);
+                            }
+                            ?> <a href=<?php the_permalink(); ?> class="nu gray">Learn more</a></p>
+                    </div>
+                </div>
+            <?php
+            }
+            ?>
+
+```
+
+### Key takeaways from the above snippet:
+
+#### Main goal is to render some posts(only the title and excerpt) on the home page
+
+#### `$homepageEvents = new WP_Query(array(...))`
+
+- **Purpose**: Creates a new custom query to fetch posts.
+- **Details**:
+  - `posts_per_page`: Limits the number of posts retrieved (2 in this case).
+  - `post_type`: Specifies the type of posts to retrieve (`event` in this case).
+
+#### `$homepageEvents->have_posts()`
+
+- **Purpose**: Checks if there are more posts available in the custom query.
+- **Returns**: `true` if posts are available; `false` otherwise.
+
+#### `$homepageEvents->the_post()`
+
+- **Purpose**: Prepares the current post data for use in the loop.
+- **Effect**: Sets up global post data (`$post`) so template tags like `the_title()` and `the_content()` work.
+
+#### `<a href="<?php the_permalink() ?>">`
+
+- **Function**: `the_permalink()`
+  - **Purpose**: Outputs the URL for the current post.
+  - **Use**: Creates a link to the detailed view of the post.
+
+#### `<?php the_title(); ?>`
+
+- **Purpose**: Outputs the title of the current post.
+
+#### `has_excerpt()`
+
+- **Purpose**: Checks if the current post has a manually defined excerpt.
+- **Returns**: `true` if an excerpt exists; `false` otherwise.
+
+#### `get_the_excerpt()`
+
+- **Purpose**: Retrieves the manually defined excerpt of the current post.
+
+#### `get_the_content()`
+
+- **Purpose**: Retrieves the full content of the current post.
+
+#### `wp_trim_words(get_the_content(), 18)`
+
+- **Purpose**: Trims the full content of the post to 18 words.
+- **Use**: Provides a shortened version of the content if no excerpt exists.
+
+#### `<a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a>`
+
+- **Purpose**: Creates a link labeled "Learn more" to the post's detail page.
+
+##### Notes
+
+- The loop structure (`while`) ensures that all posts from the query are processed.
+- This code fetches and displays a summary of the latest two `event` posts, including their titles, excerpts (or trimmed content), and a "Learn more" link.
+
+```
+
+```
