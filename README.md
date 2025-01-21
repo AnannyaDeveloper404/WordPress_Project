@@ -392,7 +392,9 @@ For Blog page ,render all the posts in the blog will be rendered in the router
   <?php echo site_url('blog') ?>
   ```
 
-- Blog renders the index.php as its main page
+- Blog renders the index.php as its main page and its archives such as **CATEGORY** or **AUTHOR** page will look for separate concerned page called archive.php
+  - For category ,You can get category `Posts` > `Categories`
+  - For Author,Wordpress usually takes the publicly available ,which is stored in USer 
 
 For rendering posts in their respective page,Wordpress will find single.php to render the post.
 
@@ -419,30 +421,30 @@ For custom posts ,wordpress will look for the file single-<custom-post-name>(e.g
 
 ```php
   <?php
-            $homepageEvents = new WP_Query(array(
-                'posts_per_page' => 2,
-                'post_type' => 'event'
-            ));
-            while ($homepageEvents->have_posts()) {
-                $homepageEvents->the_post(); ?>
-                <div class="event-summary">
-                    <a class="event-summary__date t-center" href="#">
-                        <span class="event-summary__month">Mar</span>
-                        <span class="event-summary__day">25</span>
-                    </a>
-                    <div class="event-summary__content">
-                        <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h5>
-                        <p><?php if (has_excerpt()) {
-                                echo get_the_excerpt();
-                            } else {
-                                echo  wp_trim_words(get_the_content(), 18);
-                            }
-                            ?> <a href=<?php the_permalink(); ?> class="nu gray">Learn more</a></p>
-                    </div>
-                </div>
-            <?php
-            }
-            ?>
+      $homepageEvents = new WP_Query(array(
+          'posts_per_page' => 2,
+          'post_type' => 'event'
+      ));
+      while ($homepageEvents->have_posts()) {
+          $homepageEvents->the_post(); ?>
+          <div class="event-summary">
+              <a class="event-summary__date t-center" href="#">
+                  <span class="event-summary__month">Mar</span>
+                  <span class="event-summary__day">25</span>
+              </a>
+              <div class="event-summary__content">
+                  <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h5>
+                  <p><?php if (has_excerpt()) {
+                          echo get_the_excerpt();
+                      } else {
+                          echo  wp_trim_words(get_the_content(), 18);
+                      }
+                      ?> <a href=<?php the_permalink(); ?> class="nu gray">Learn more</a></p>
+              </div>
+          </div>
+      <?php
+      }
+      ?>
 
 ```
 
@@ -507,3 +509,204 @@ For custom posts ,wordpress will look for the file single-<custom-post-name>(e.g
 ```
 
 ```
+### SNIPPET CODE
+```php
+
+<?php
+
+function university_files(){
+    wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);//hey wordpress, please output the main.js file
+    wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+    wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
+    wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));//hey wordpress, please output the style.css file(default stylesheet in wordpress)
+    wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
+}
+add_action('wp_enqueue_scripts', 'university_files');//hey wordpress, when you are about to output the scripts, please run this function
+
+
+function university_features(){
+    // register_nav_menu('headerMenuLocation', 'Header Menu Location'); //hey wordpress, please add the header menu location
+    // register_nav_menu('footerLocationOne', 'Footer Location One');
+    // register_nav_menu('footerLocationTwo', 'Footer Location Two');
+    add_theme_support('title-tag');//hey wordpress, please add the title tag to the head of the document
+    add_theme_support('post-thumbnails');//hey wordpress, please add the post thumbnail feature
+    add_image_size('professorLandscape', 400, 260, true);
+    add_image_size('professorLandscape', 480, 650, true);
+
+}
+add_action( 'after_setup_theme','university_features');
+
+function university_adjust_queries($query){
+    if(!is_admin() && is_post_type_archive('program') && is_main_query()){
+        $query->set('orderby', 'title');
+        $query->set('order', 'ASC');
+        $query->set('posts_per_page', -1);
+    }
+
+    if(!is_admin() && is_post_type_archive('event') && $query->is_main_query()){
+        $today = date('Ymd');
+        $query->set('meta_key', 'event_date');
+        $query->set('orderby', 'meta_value_num');
+        $query->set('order', 'ASC');
+        $query->set('meta_query', array(
+            array(
+                'key' => 'event_date',
+                'compare' => '>=',
+                'value' =>$today,
+                'type' => 'numeric'
+            )
+        ));
+    }
+}
+
+
+add_action('pre_get_posts', 'university_adjust_queries');
+```
+#### Explanation of above code
+---
+
+### **Function 1: Enqueuing Scripts and Styles**
+```php
+function university_files(){
+    wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);
+```
+- **`wp_enqueue_script`**: Registers and enqueues a JavaScript file in WordPress.
+- `'main-university-js'`: A unique handle to identify this script.
+- **`get_theme_file_uri('/build/index.js')`**: Retrieves the URL for the `index.js` file located in the `/build` directory of the theme.
+- **`array('jquery')`**: Specifies `jquery` as a dependency for this script, ensuring it loads first.
+- **`'1.0'`**: Version number for cache busting.
+- **`true`**: Indicates the script should be loaded in the footer (`false` would load it in the header).
+
+```php
+    wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+```
+- **`wp_enqueue_style`**: Registers and enqueues a CSS file in WordPress.
+- `'font-awesome'`: Unique handle for this stylesheet.
+- **URL**: Loads Font Awesome from a CDN.
+
+```php
+    wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
+```
+- Loads custom Google Fonts via a URL.
+
+```php
+    wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));
+```
+- Loads the theme's primary stylesheet (`style-index.css`).
+
+```php
+    wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
+```
+- Loads an additional stylesheet (`index.css`).
+
+```php
+}
+add_action('wp_enqueue_scripts', 'university_files');
+```
+- **`add_action('wp_enqueue_scripts', 'university_files')`**: Hooks `university_files` into the `wp_enqueue_scripts` action to load styles and scripts when WordPress outputs scripts on the front end.
+
+---
+
+### **Function 2: Adding Theme Features**
+```php
+function university_features(){
+```
+- Defines the `university_features` function to add theme-related features.
+
+```php
+    add_theme_support('title-tag');
+```
+- Enables WordPress to manage the `<title>` tag dynamically.
+
+```php
+    add_theme_support('post-thumbnails');
+```
+- Enables support for featured images (post thumbnails).
+
+```php
+    add_image_size('professorLandscape', 400, 260, true);
+```
+- Registers a custom image size:
+  - `'professorLandscape'`: The handle for this image size.
+  - `400, 260`: Width and height in pixels.
+  - `true`: Crops the image to these exact dimensions.
+
+```php
+    add_image_size('professorPortrait', 480, 650, true);
+```
+- Registers another custom image size for portrait images.
+
+```php
+}
+add_action( 'after_setup_theme','university_features');
+```
+- Hooks `university_features` into the `after_setup_theme` action to initialize theme features when the theme is set up.
+
+---
+
+### **Function 3: Adjusting Queries**
+```php
+function university_adjust_queries($query){
+```
+- Defines the `university_adjust_queries` function to customize WordPress queries.
+
+```php
+    if(!is_admin() && is_post_type_archive('program') && is_main_query()){
+```
+- Checks if:
+  - **`!is_admin()`**: The request is not for the admin dashboard.
+  - **`is_post_type_archive('program')`**: The query is for the archive page of the custom post type `program`.
+  - **`is_main_query()`**: It’s the primary query (not a custom or secondary query).
+
+```php
+        $query->set('orderby', 'title');
+        $query->set('order', 'ASC');
+        $query->set('posts_per_page', -1);
+```
+- Modifies the query:
+  - Orders posts by title (`orderby`).
+  - Sets ascending order (`ASC`).
+  - Displays all posts (`-1` means no pagination).
+
+```php
+    if(!is_admin() && is_post_type_archive('event') && $query->is_main_query()){
+```
+- Similar to the first condition but for the custom post type `event`.
+
+```php
+        $today = date('Ymd');
+```
+- Gets the current date in `YYYYMMDD` format.
+
+```php
+        $query->set('meta_key', 'event_date');
+        $query->set('orderby', 'meta_value_num');
+        $query->set('order', 'ASC');
+        $query->set('meta_query', array(
+            array(
+                'key' => 'event_date',
+                'compare' => '>=',
+                'value' =>$today,
+                'type' => 'numeric'
+            )
+        ));
+```
+- Customizes the query:
+  - Sorts posts by a meta key (`event_date`) numerically (`meta_value_num`).
+  - Includes only posts where `event_date` is greater than or equal to today’s date (`>=`).
+  - Uses a meta query to filter posts based on the `event_date` meta key.
+
+```php
+    }
+}
+add_action('pre_get_posts', 'university_adjust_queries');
+```
+- Hooks `university_adjust_queries` into the `pre_get_posts` action, allowing it to modify the query before WordPress retrieves posts.
+
+---
+
+### **Summary**
+This script:
+1. Loads JavaScript and CSS files for the theme.
+2. Adds theme features like title tags, post thumbnails, and custom image sizes.
+3. Customizes queries for specific post type archives (`program` and `event`).

@@ -7,16 +7,7 @@ get_header();
     <div class="page-banner__content container container--narrow">
         <h1 class="page-banner__title">
             All Events
-            <!-- <?php
-                    if (is_category()) {
-                        single_cat_title();
-                    }
-                    if (is_author()) {
-                        echo 'Posts by :';
-                        the_author();
-                    }
-
-                    ?> -->
+            
         </h1>
         <div class="page-banner__intro">
             <p>See what is going on in our world!</p>
