@@ -1,10 +1,14 @@
-import "../css/style.scss"
+import "../css/style.scss";
 
 // Our modules / classes
-import MobileMenu from "./modules/MobileMenu"
-import HeroSlider from "./modules/HeroSlider"
+import MobileMenu from "./modules/MobileMenu";
+import HeroSlider from "./modules/HeroSlider";
+import GMap from "./modules/GoogleMap";
 
 // Instantiate a new object using our modules/classes
-const mobileMenu = new MobileMenu()
-const heroSlider = new HeroSlider()
-alert("JUST A TASTE");
+const mobileMenu = new MobileMenu();
+const heroSlider = new HeroSlider();
+const googleMap = new GMap();
+
+// AIzaSyDdneB964qxoVUPB1ytaZPQAeua3uV6zlk
+// AIzaSyCRHeN1BW0gMZrj9eAOMmRoARhvHWb_WHc

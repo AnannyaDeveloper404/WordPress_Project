@@ -35,7 +35,7 @@ function university_post_types()
     ));
     // Professor post type
     register_post_type('professor', array(
-        'supports' => array('title', 'editor','thumbnail'),
+        'supports' => array('title', 'editor', 'thumbnail'),
         'rewrite' => array('slug' => 'professors'),
         'public' => true,
         'show_in_rest' => true,
@@ -47,6 +47,22 @@ function university_post_types()
             'singular_name' => 'professor'
         ),
         'menu_icon' => 'dashicons-welcome-learn-more',
+    ));
+    //campus post type
+    register_post_type('campus', array(
+        'supports' => array('title', 'editor', 'thumbnail'),
+        'has_archive' => true,
+        'rewrite' => array('slug' => 'campuses'),
+        'public' => true,
+        'show_in_rest' => true,
+        'labels' => array(
+            'name' => 'Campuses',
+            'add_new_item' => 'Add New Campus',
+            'edit_item' => 'Edit Campus',
+            'all_items' => 'All Campuses',
+            'singular_name' => 'Campus'
+        ),
+        'menu_icon' => 'dashicons-location-alt',
     ));
 }
 
