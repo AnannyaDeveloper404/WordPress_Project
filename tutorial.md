@@ -61,6 +61,8 @@ echo 2 + 4;
 
 <h1><?php
  bloginfo('name');
+ //This function returns the name of the site, which is set in the WordPress dashboard → Settings → General → Site Title.
+
   ?>
   </h1>
 
@@ -68,6 +70,7 @@ echo 2 + 4;
 
   <?php
  bloginfo('description');
+ //This function returns the tagline (site description), set in WordPress dashboard → Settings → General → Tagline.
   ?>
   </p>
   <!-- Arrays -->
@@ -164,7 +167,7 @@ echo 2 + 4;
 - **`bloginfo('description')`**:  
   Retrieves the website's tagline or description.
 
-#### Retrieves url of the images
+#### Retrieves url of the images present in your local repo
 
 ```php
 <?php
@@ -394,7 +397,7 @@ For Blog page ,render all the posts in the blog will be rendered in the router
 
 - Blog renders the index.php as its main page and its archives such as **CATEGORY** or **AUTHOR** page will look for separate concerned page called archive.php
   - For category ,You can get category `Posts` > `Categories`
-  - For Author,Wordpress usually takes the publicly available ,which is stored in USer 
+  - For Author,Wordpress usually takes the publicly available ,which is stored in USer
 
 For rendering posts in their respective page,Wordpress will find single.php to render the post.
 
@@ -509,7 +512,9 @@ For custom posts ,wordpress will look for the file single-<custom-post-name>(e.g
 ```
 
 ```
+
 ### SNIPPET CODE
+
 ```php
 
 <?php
@@ -562,14 +567,18 @@ function university_adjust_queries($query){
 
 add_action('pre_get_posts', 'university_adjust_queries');
 ```
+
 #### Explanation of above code
+
 ---
 
 ### **Function 1: Enqueuing Scripts and Styles**
+
 ```php
 function university_files(){
     wp_enqueue_script('main-university-js', get_theme_file_uri('/build/index.js'), array('jquery'), '1.0', true);
 ```
+
 - **`wp_enqueue_script`**: Registers and enqueues a JavaScript file in WordPress.
 - `'main-university-js'`: A unique handle to identify this script.
 - **`get_theme_file_uri('/build/index.js')`**: Retrieves the URL for the `index.js` file located in the `/build` directory of the theme.
@@ -580,6 +589,7 @@ function university_files(){
 ```php
     wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 ```
+
 - **`wp_enqueue_style`**: Registers and enqueues a CSS file in WordPress.
 - `'font-awesome'`: Unique handle for this stylesheet.
 - **URL**: Loads Font Awesome from a CDN.
@@ -587,45 +597,54 @@ function university_files(){
 ```php
     wp_enqueue_style('custom-google-fonts', 'https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
 ```
+
 - Loads custom Google Fonts via a URL.
 
 ```php
     wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));
 ```
+
 - Loads the theme's primary stylesheet (`style-index.css`).
 
 ```php
     wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
 ```
+
 - Loads an additional stylesheet (`index.css`).
 
 ```php
 }
 add_action('wp_enqueue_scripts', 'university_files');
 ```
+
 - **`add_action('wp_enqueue_scripts', 'university_files')`**: Hooks `university_files` into the `wp_enqueue_scripts` action to load styles and scripts when WordPress outputs scripts on the front end.
 
 ---
 
 ### **Function 2: Adding Theme Features**
+
 ```php
 function university_features(){
 ```
+
 - Defines the `university_features` function to add theme-related features.
 
 ```php
     add_theme_support('title-tag');
 ```
+
 - Enables WordPress to manage the `<title>` tag dynamically.
 
 ```php
     add_theme_support('post-thumbnails');
 ```
+
 - Enables support for featured images (post thumbnails).
 
 ```php
     add_image_size('professorLandscape', 400, 260, true);
 ```
+
 - Registers a custom image size:
   - `'professorLandscape'`: The handle for this image size.
   - `400, 260`: Width and height in pixels.
@@ -634,25 +653,30 @@ function university_features(){
 ```php
     add_image_size('professorPortrait', 480, 650, true);
 ```
+
 - Registers another custom image size for portrait images.
 
 ```php
 }
 add_action( 'after_setup_theme','university_features');
 ```
+
 - Hooks `university_features` into the `after_setup_theme` action to initialize theme features when the theme is set up.
 
 ---
 
 ### **Function 3: Adjusting Queries**
+
 ```php
 function university_adjust_queries($query){
 ```
+
 - Defines the `university_adjust_queries` function to customize WordPress queries.
 
 ```php
     if(!is_admin() && is_post_type_archive('program') && is_main_query()){
 ```
+
 - Checks if:
   - **`!is_admin()`**: The request is not for the admin dashboard.
   - **`is_post_type_archive('program')`**: The query is for the archive page of the custom post type `program`.
@@ -663,6 +687,7 @@ function university_adjust_queries($query){
         $query->set('order', 'ASC');
         $query->set('posts_per_page', -1);
 ```
+
 - Modifies the query:
   - Orders posts by title (`orderby`).
   - Sets ascending order (`ASC`).
@@ -671,11 +696,13 @@ function university_adjust_queries($query){
 ```php
     if(!is_admin() && is_post_type_archive('event') && $query->is_main_query()){
 ```
+
 - Similar to the first condition but for the custom post type `event`.
 
 ```php
         $today = date('Ymd');
 ```
+
 - Gets the current date in `YYYYMMDD` format.
 
 ```php
@@ -691,6 +718,7 @@ function university_adjust_queries($query){
             )
         ));
 ```
+
 - Customizes the query:
   - Sorts posts by a meta key (`event_date`) numerically (`meta_value_num`).
   - Includes only posts where `event_date` is greater than or equal to today’s date (`>=`).
@@ -701,12 +729,15 @@ function university_adjust_queries($query){
 }
 add_action('pre_get_posts', 'university_adjust_queries');
 ```
+
 - Hooks `university_adjust_queries` into the `pre_get_posts` action, allowing it to modify the query before WordPress retrieves posts.
 
 ---
 
 ### **Summary**
+
 This script:
+
 1. Loads JavaScript and CSS files for the theme.
 2. Adds theme features like title tags, post thumbnails, and custom image sizes.
 3. Customizes queries for specific post type archives (`program` and `event`).
