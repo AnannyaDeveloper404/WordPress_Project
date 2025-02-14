@@ -14,9 +14,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/HeroSlider */ "./src/modules/HeroSlider.js");
 /* harmony import */ var _modules_GoogleMap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/GoogleMap */ "./src/modules/GoogleMap.js");
 /* harmony import */ var _modules_Search__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/Search */ "./src/modules/Search.js");
+/* harmony import */ var _modules_MyNote__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/MyNote */ "./src/modules/MyNote.js");
 
 
 // Our modules / classes
+
 
 
 
@@ -27,6 +29,7 @@ const mobileMenu = new _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__["default
 const heroSlider = new _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__["default"]();
 const googleMap = new _modules_GoogleMap__WEBPACK_IMPORTED_MODULE_3__["default"]();
 const search = new _modules_Search__WEBPACK_IMPORTED_MODULE_4__["default"]();
+const myNote = new _modules_MyNote__WEBPACK_IMPORTED_MODULE_5__["default"]();
 
 // AIzaSyDdneB964qxoVUPB1ytaZPQAeua3uV6zlk
 // AIzaSyCRHeN1BW0gMZrj9eAOMmRoARhvHWb_WHc
@@ -185,6 +188,52 @@ class MobileMenu {
 
 /***/ }),
 
+/***/ "./src/modules/MyNote.js":
+/*!*******************************!*\
+  !*** ./src/modules/MyNote.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "jquery");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+
+class MyNotes {
+  constructor() {
+    this.events();
+  }
+  events() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()(".delete-notes").on("click", this.deleteNote);
+  }
+  deleteNote(e) {
+    var thisNote = jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).parents("li");
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().ajax({
+      beforeSend: xhr => {
+        xhr.setRequestHeader('X-WP-Nonce', universityData.nonce);
+      },
+      url: universityData.root_url + '/wp-json/wp/v2/note/' + thisNote.data('id'),
+      type: 'DELETE',
+      success: response => {
+        console.log("Deleted");
+        console.log(response);
+      },
+      error: response => {
+        console.log("Error");
+        console.log(response);
+      }
+    });
+  }
+  createNote() {
+    alert("Note Created");
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MyNotes);
+
+/***/ }),
+
 /***/ "./src/modules/Search.js":
 /*!*******************************!*\
   !*** ./src/modules/Search.js ***!
@@ -239,19 +288,60 @@ class Search {
     }
   }
   getResults() {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON();
-    jquery__WEBPACK_IMPORTED_MODULE_0___default().when(jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(`${universityData.root_url}/wp-json/wp/v2/posts?search=${this.searchField.val()}`), jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(`${universityData.root_url}/wp-json/wp/v2/pages?search=${this.searchField.val()}`)).then((posts, pages) => {
-      var combinedResult = posts[0].concat(pages[0]);
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(`${universityData.root_url}/wp-json/university/v1/search?term=${this.searchField.val()}`, results => {
       this.resultsDiv.html(`
-            <h2 class="search-overlay__section-title">General Information</h2>
-        ${combinedResult.length ? '<ul class="link-list min-list">' : "<p>No general info</p>"}
-              ${combinedResult.map(item => `<li><a href='${item.link}'>${item.title.rendered}</a> ${item.type == "post" ? `by ${item.authorName}` : ""}</li>`)} 
-             ${combinedResult.length ? "</ul>" : ""}
-          `);
-      this.isSpinnerVisible = false;
-    }, () => {
-      this.resultsDiv.html("<p>Unexpected Error</p>");
+          <div class="one-third">
+            <h2 class="search-overlay__section-title">
+              General Info
+            </h2>
+              ${results.generalInfo.length ? '<ul class="link-list min-list">' : "<p>No generated content</p>"}${results.generalInfo.map(item => `<li><a href='${item.permalink}'>${item.title}</a>  ${item.postType == "post" ? `by ${item.authorName}` : ""}</li>`)} 
+             ${results.generalInfo.length ? "</ul>" : ""}
+          </div>
+          <div class="one-third">
+            <h2 class="search-overlay__section-title">
+              Programs
+            </h2>
+            ${results.programs.length ? '<ul class="link-list min-list">' : "<p>No generated content</p>"}${results.programs.map(item => `<li><a href='${item.permalink}'>${item.title}</a> </li>`)} 
+             ${results.programs.length ? "</ul>" : ""}
+            <h2 class="search-overlay__section-title">
+              Professors
+            </h2>
+            ${results.professors.length ? '<ul class="professor-cards">' : "<p>No generated content</p>"}${results.professors.map(item => `
+                <li class="professor-card__list-item">
+                    <a class="professor-card" href="${item.permalink}">
+                        <img class="professor-card__image" src="${item.image}">
+                        <span class="professor-card__name">${item.title}</span>
+                    </a>
+                </li>
+            `)} 
+             ${results.professors.length ? "</ul>" : ""}
+          </div>
+          <div class="one-third">
+            <h2 class="search-overlay__section-title">
+              Campuses
+            </h2>
+            ${results.campuses.length ? '<ul class="link-list min-list">' : "<p>No generated content</p>"}${results.campuses.map(item => `<li><a href='${item.permalink}'>${item.title}</a> </li>`)} 
+             ${results.campuses.length ? "</ul>" : ""}
+            <h2 class="search-overlay__section-title">
+              Events
+            </h2>
+            ${results.events.length ? '<ul class="link-list min-list">' : "<p>No generated content</p>"}${results.events.map(item => `
+                <div class="event-summary">
+          <a class="event-summary__date t-center" href="${item.permalink}">
+        <span class="event-summary__month">${item.month}</span>
+        <span class="event-summary__day">${item.day}</span>
+    </a>
+    <div class="event-summary__content">
+        <h5 class="event-summary__title headline headline--tiny"><a href="${item.permalink}">${item.title}</a></h5>
+        <p>${item.description} <a href="${item.permalink}" class="nu gray">Learn more</a></p>
+    </div>
+</div>
+            `)} 
+             ${results.events.length ? "</ul>" : ""}
+          </div>
+        `);
     });
+    this.isSpinnerVisible = false;
   }
   keyPressDispatcher(e) {
     if (!this.isOverlayOpen && e.keyCode == 83 && !jquery__WEBPACK_IMPORTED_MODULE_0___default()("input,textarea").is(":focus")) {

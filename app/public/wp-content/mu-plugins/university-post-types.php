@@ -3,6 +3,8 @@ function university_post_types()
 {
     // Event Post Type
     register_post_type('event', array(
+        'capability_type' => 'event',
+        'map_meta_cap' => true,
         'supports' => array('title', 'editor', 'excerpt'),
         'rewrite' => array('slug' => 'events'),
         'has_archive' => true,
@@ -63,6 +65,22 @@ function university_post_types()
             'singular_name' => 'Campus'
         ),
         'menu_icon' => 'dashicons-location-alt',
+    ));
+    register_post_type('note', array(
+        'supports' => array('title', 'editor'),
+        'has_archive' => true,
+        'rewrite' => array('slug' => 'notes'),
+        'public' => false,//this will hide a specific user's notes from the public
+        'show_ui' => true,//this will show the notes in the admin dashboard
+        'show_in_rest' => true,
+        'labels' => array(
+            'name' => 'Notes',
+            'add_new_item' => 'Add New Note',
+            'edit_item' => 'Edit Note',
+            'all_items' => 'All Notees',
+            'singular_name' => 'Note'
+        ),
+        'menu_icon' => 'dashicons-welcome-write-blog',
     ));
 }
 
