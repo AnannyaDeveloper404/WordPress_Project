@@ -7,7 +7,7 @@ function universityRegisterSearch()
         'methods' => WP_REST_SERVER::READABLE,
         'callback' => "universitySearchResults"
     ));
-}
+} 
 function universitySearchResults($data)
 {
     $mainQuery = new WP_Query(array(
